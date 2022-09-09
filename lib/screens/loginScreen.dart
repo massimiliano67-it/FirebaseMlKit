@@ -1,7 +1,15 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebasemlkit/classes/userprovider.dart';
+import 'package:firebasemlkit/screens/homescreen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:firebasemlkit/screens/signUpScreen.dart';
 import 'package:firebasemlkit/widgets/inputTextWidget.dart';
+import 'package:provider/provider.dart';
+
+import '../classes/userprovider.dart';
+import '../utils/authfirebase.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen() : super();
@@ -11,18 +19,34 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _SearchScreenState extends State<LoginScreen> {
+  Future<FirebaseApp> _initializeFirebase() async {
+    FirebaseApp firebaseApp = await Firebase.initializeApp();
+
+    User? user = FirebaseAuth.instance.currentUser;
+
+    if (user != null) {
+      //  Get.to(const HomeScreen());
+    }
+    return firebaseApp;
+  }
+
   final TextEditingController _pwdController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   //final snackBar = SnackBar(content: Text('email ou mot de passe incorrect'));
   final _formKey = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
+    UserProvider userProvider = context.watch<UserProvider>();
+
+    future:
+    _initializeFirebase();
     final screenWidth = MediaQuery.of(context).size.width;
     const double r = (175 / 360); //  rapport for web test(304 / 540);
     final coverHeight = screenWidth * r;
     bool _pinned = false;
     bool _snap = false;
     bool _floating = false;
+    bool _isloading = false;
 
     final widgetList = [
       Row(
@@ -37,7 +61,6 @@ class _SearchScreenState extends State<LoginScreen> {
               fontSize: 40,
               fontWeight: FontWeight.bold,
               color: Color(0xff000000),
-              
             ),
             textAlign: TextAlign.left,
           ),
@@ -91,7 +114,35 @@ class _SearchScreenState extends State<LoginScreen> {
                 child: ElevatedButton(
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {
-                      print("I ove tunisia");
+                      User? user = await FireAuth.signInUsingEmailPassword(
+                        email: _emailController.text,
+                        password: _pwdController.text,
+                      );
+                      if (user != null) {
+                        this.context.read<UserProvider>().setUser(
+                            email: user.email,
+                            displyname: user.displayName,
+                            urlphoto: user.photoURL);
+
+                        print(userProvider.email);
+                        Get.to(const HomeScreen());
+                      } else {
+                        showDialog(
+                          context: context,
+                          builder: (ctx) => AlertDialog(
+                            title: const Text("Ops! Login Failed"),
+                            content: const Text("Ops! Login Failed"),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.of(ctx).pop();
+                                },
+                                child: const Text('Okay'),
+                              )
+                            ],
+                          ),
+                        );
+                      }
                     }
                     //Get.to(ChoiceScreen());
                   },
@@ -99,7 +150,7 @@ class _SearchScreenState extends State<LoginScreen> {
                     primary: Colors.white,
                     elevation: 0.0,
                     minimumSize: Size(screenWidth, 150),
-                    padding: EdgeInsets.symmetric(horizontal: 30),
+                    padding: const EdgeInsets.symmetric(horizontal: 30),
                     shape: const RoundedRectangleBorder(
                       borderRadius: BorderRadius.all(Radius.circular(0)),
                     ),
@@ -213,7 +264,6 @@ class _SearchScreenState extends State<LoginScreen> {
     ];
     return Scaffold(
       extendBodyBehindAppBar: true,
-
       body: CustomScrollView(
         slivers: <Widget>[
           SliverAppBar(
@@ -231,12 +281,9 @@ class _SearchScreenState extends State<LoginScreen> {
           SliverToBoxAdapter(
             child: Container(
               decoration: const BoxDecoration(
-                  borderRadius: BorderRadius.only(
-                      ),
+                  borderRadius: BorderRadius.only(),
                   gradient: LinearGradient(
-                      colors: <Color>[Color(0xFFdccdb4), Color(0xFFd8c3ab)])
-                  
-                  ),
+                      colors: <Color>[Color(0xFFdccdb4), Color(0xFFd8c3ab)])),
               width: screenWidth,
               height: 25,
               child: Column(
@@ -247,7 +294,6 @@ class _SearchScreenState extends State<LoginScreen> {
                     height: 25,
                     decoration: const BoxDecoration(
                       color: Colors.white,
-                      
                       borderRadius: BorderRadius.only(
                         topLeft: Radius.circular(30.0),
                         topRight: Radius.circular(30.0),

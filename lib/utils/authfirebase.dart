@@ -2,11 +2,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 class FireAuth {
   // For registering a new user
-  static Future<User?> registerUsingEmailPassword({
-    required String name,
-    required String email,
-    required String password,
-  }) async {
+  static Future<User?> registerUsingEmailPassword(
+      {required String name,
+      required String email,
+      required String password,
+      String? urlphoto}) async {
     FirebaseAuth auth = FirebaseAuth.instance;
     User? user;
 
@@ -18,6 +18,8 @@ class FireAuth {
 
       user = userCredential.user;
       await user!.updateDisplayName(name);
+      await user.updatePhotoURL(urlphoto);
+
       await user.reload();
       user = auth.currentUser;
     } on FirebaseAuthException catch (e) {

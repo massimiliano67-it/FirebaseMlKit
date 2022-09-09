@@ -14,7 +14,6 @@ class InputTextWidget extends StatelessWidget {
       required this.keyboardType,
       this.controller})
       : super();
- 
 
   @override
   Widget build(BuildContext context) {
@@ -39,17 +38,18 @@ class InputTextWidget extends StatelessWidget {
                     size: 32.0, /*Color(0xff224597)*/
                   ),
                   labelText: labelText,
-                  labelStyle: TextStyle(color: Colors.black54, fontSize: 18.0),
+                  labelStyle:
+                      const TextStyle(color: Colors.black54, fontSize: 18.0),
                   hintText: '',
                   enabledBorder: InputBorder.none,
-                  focusedBorder: UnderlineInputBorder(
+                  focusedBorder: const UnderlineInputBorder(
                     borderSide: BorderSide(color: Colors.black54),
                   ),
                   border: InputBorder.none,
                 ),
                 validator: (val) {
                   if (val!.isEmpty) {
-                    return 'le champ de texte est vide!';
+                    return '¡El campo de texto está vacío!';
                   }
                 }),
           ),

@@ -1,7 +1,13 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebasemlkit/screens/homescreen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:firebasemlkit/widgets/inputTextWidget.dart';
+import 'package:provider/provider.dart';
 
+import '../classes/userprovider.dart';
+import '../utils/authfirebase.dart';
 import 'loginScreen.dart';
 
 class SignUpScreen extends StatefulWidget {
@@ -16,20 +22,23 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController _pass = TextEditingController();
   final TextEditingController _confirmPass = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _nameController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
+    UserProvider userProvider = context.watch<UserProvider>();
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
       appBar: AppBar(
-        title: Text("Sign Up",
+        title: const Text("Sign Up",
             style: TextStyle(
               color: Colors.black,
               fontFamily: 'Segoe UI',
               fontSize: 30,
               shadows: [
                 Shadow(
-                  color: const Color(0xba000000),
+                  color: Color(0xba000000),
                   offset: Offset(0, 3),
                   blurRadius: 6,
                 )
@@ -37,8 +46,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
             )),
         //centerTitle: true,
         leading: InkWell(
-          onTap: () => Get.to(LoginScreen()),
-          child: Icon(
+          onTap: () => Get.to(const LoginScreen()),
+          child: const Icon(
             Icons.arrow_back,
             color: Colors.black,
           ),
@@ -50,18 +59,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
         padding: const EdgeInsets.only(top: 15.0),
         child: Container(
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.only(
+            borderRadius: const BorderRadius.only(
               topLeft: Radius.circular(30),
               topRight: Radius.circular(30),
             ),
             color: Colors.white,
-            
             boxShadow: [
               BoxShadow(
                 color: Colors.grey.withOpacity(0.5),
                 spreadRadius: 5,
                 blurRadius: 7,
-                offset: Offset(0, 3), // changes position of shadow
+                offset: const Offset(0, 3), // changes position of shadow
               ),
             ],
           ),
@@ -73,37 +81,37 @@ class _SignUpScreenState extends State<SignUpScreen> {
               key: _formKey,
               child: Column(
                 children: [
-                  SizedBox(
+                  const SizedBox(
                     height: 30.0,
                   ),
-                  Text(
+                  const Text(
                     'Welcome to our house!!',
                     style: TextStyle(
                       fontFamily: 'Segoe UI',
                       fontSize: 30,
                       fontWeight: FontWeight.bold,
-                      color: const Color(0xff000000),
-                      
+                      color: Color(0xff000000),
                     ),
                     textAlign: TextAlign.left,
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 25.0,
                   ),
                   InputTextWidget(
+                      controller: _nameController,
                       labelText: "First name",
                       icon: Icons.person,
                       obscureText: false,
                       keyboardType: TextInputType.text),
-                  SizedBox(
+                  const SizedBox(
                     height: 12.0,
                   ),
-                  InputTextWidget(
+                  const InputTextWidget(
                       labelText: "Last Name",
                       icon: Icons.person,
                       obscureText: false,
                       keyboardType: TextInputType.text),
-                  SizedBox(
+                  const SizedBox(
                     height: 12.0,
                   ),
                   InputTextWidget(
@@ -112,18 +120,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       icon: Icons.email,
                       obscureText: false,
                       keyboardType: TextInputType.emailAddress),
-                  SizedBox(
+                  const SizedBox(
                     height: 12.0,
                   ),
-                  InputTextWidget(
+                  const InputTextWidget(
                       labelText: "Telephone number",
                       icon: Icons.phone,
                       obscureText: false,
                       keyboardType: TextInputType.number),
-                  SizedBox(
+                  const SizedBox(
                     height: 12.0,
                   ),
-
                   Padding(
                     padding: const EdgeInsets.only(left: 25.0, right: 25.0),
                     child: Container(
@@ -138,7 +145,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               obscureText: true,
                               autofocus: false,
                               keyboardType: TextInputType.text,
-                              decoration: InputDecoration(
+                              decoration: const InputDecoration(
                                 icon: Icon(
                                   Icons.lock,
                                   color: Colors.black,
@@ -168,10 +175,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       ),
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 15.0,
                   ),
-                 
                   Padding(
                     padding: const EdgeInsets.only(left: 25.0, right: 25.0),
                     child: Container(
@@ -186,7 +192,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               obscureText: true,
                               autofocus: false,
                               keyboardType: TextInputType.text,
-                              decoration: InputDecoration(
+                              decoration: const InputDecoration(
                                 icon: Icon(
                                   Icons.lock,
                                   color: Colors.black,
@@ -204,8 +210,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               ),
                               controller: _confirmPass,
                               validator: (val) {
-                                if (val!.isEmpty)
-                                  return 'confirm password!!';
+                                if (val!.isEmpty) return 'confirm password!!';
                                 if (val != _pass.text)
                                   return 'Incorrect password';
                                 return null;
@@ -214,38 +219,67 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       ),
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 15.0,
                   ),
                   Container(
                     height: 55.0,
                     child: ElevatedButton(
                       onPressed: () async {
-                        if (_formKey.currentState!.validate()) {}
+                        if (_formKey.currentState!.validate()) {
+                          User? user =
+                              await FireAuth.registerUsingEmailPassword(
+                                  email: _emailController.text,
+                                  password: _pass.text,
+                                  name: _nameController.text);
+                          if (user != null) {
+                            this.context.read<UserProvider>().setUser(
+                                email: user.email,
+                                displyname: user.displayName,
+                                urlphoto: user.photoURL);
+                            Get.to(const HomeScreen());
+                          } else {
+                            showDialog(
+                              context: context,
+                              builder: (ctx) => AlertDialog(
+                                title: const Text("Ops! Registration Failed"),
+                                content: const Text("Ops! Registration Failed"),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.of(ctx).pop();
+                                    },
+                                    child: const Text('Okay'),
+                                  )
+                                ],
+                              ),
+                            );
+                          }
+                        }
                       },
                       style: ElevatedButton.styleFrom(
                         primary: Colors.white,
                         elevation: 0.0,
                         minimumSize: Size(screenWidth, 150),
-                        padding: EdgeInsets.symmetric(horizontal: 30),
+                        padding: const EdgeInsets.symmetric(horizontal: 30),
                         shape: const RoundedRectangleBorder(
                           borderRadius: BorderRadius.all(Radius.circular(0)),
                         ),
                       ),
                       child: Ink(
                         decoration: BoxDecoration(
-                            boxShadow: <BoxShadow>[
+                            boxShadow: const <BoxShadow>[
                               BoxShadow(
                                   color: Color(0xfff05945),
-                                  offset: const Offset(1.1, 1.1),
+                                  offset: Offset(1.1, 1.1),
                                   blurRadius: 10.0),
                             ],
-                            color: Color(0xffF05945),
+                            color: const Color(0xffF05945),
                             borderRadius: BorderRadius.circular(12.0)),
                         child: Container(
                           alignment: Alignment.center,
-                          child: Text(
-                            "Continuer",
+                          child: const Text(
+                            "Register",
                             textAlign: TextAlign.center,
                             style: TextStyle(color: Colors.white, fontSize: 25),
                           ),
