@@ -8,7 +8,7 @@ import 'package:firebasemlkit/screens/signUpScreen.dart';
 import 'package:firebasemlkit/widgets/inputTextWidget.dart';
 import 'package:provider/provider.dart';
 
-import '../classes/userprovider.dart';
+import '../classes/geopositionprovider.dart';
 import '../utils/authfirebase.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -25,7 +25,7 @@ class _SearchScreenState extends State<LoginScreen> {
     User? user = FirebaseAuth.instance.currentUser;
 
     if (user != null) {
-      //  Get.to(const HomeScreen());
+      Get.to(const HomeScreen());
     }
     return firebaseApp;
   }
@@ -38,7 +38,6 @@ class _SearchScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     UserProvider userProvider = context.watch<UserProvider>();
 
-    future:
     _initializeFirebase();
     final screenWidth = MediaQuery.of(context).size.width;
     const double r = (175 / 360); //  rapport for web test(304 / 540);
@@ -120,9 +119,10 @@ class _SearchScreenState extends State<LoginScreen> {
                       );
                       if (user != null) {
                         this.context.read<UserProvider>().setUser(
-                            email: user.email,
+                            email: _emailController.text,
                             displyname: user.displayName,
-                            urlphoto: user.photoURL);
+                            urlphoto: user.photoURL,
+                            phoneNumber: "");
 
                         print(userProvider.email);
                         Get.to(const HomeScreen());

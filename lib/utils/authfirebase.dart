@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class FireAuth {
@@ -6,9 +7,13 @@ class FireAuth {
       {required String name,
       required String email,
       required String password,
+      required String phoneNumber,
       String? urlphoto}) async {
     FirebaseAuth auth = FirebaseAuth.instance;
+    FirebaseFirestore firestore = FirebaseFirestore.instance;
+
     User? user;
+    var uid = "";
 
     try {
       UserCredential userCredential = await auth.createUserWithEmailAndPassword(
@@ -22,13 +27,28 @@ class FireAuth {
 
       await user.reload();
       user = auth.currentUser;
+      uid = user!.uid;
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
         print('ERROR: The password provided is too weak.');
+        return user;
       } else if (e.code == 'email-already-in-use') {
         print('ERROR: The account already exists for that email.');
+        return user;
       }
     } catch (e) {
+      print("ERROR: " + e.toString());
+      return user;
+    }
+    // ignore: avoid_single_cascade_in_expression_statements
+    try {
+      await firestore.collection('users').doc(uid).set({
+        'id': uid,
+        'name': name,
+        'phoneNumber': phoneNumber,
+        'urlPhoto': urlphoto
+      });
+    } on Exception catch (e) {
       print("ERROR: " + e.toString());
     }
 

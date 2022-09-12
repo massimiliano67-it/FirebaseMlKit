@@ -4,13 +4,20 @@ class UserProvider with ChangeNotifier {
   String? _email;
   String? _displayname;
   String? _urlPhoto;
+  String? _phoneNumber;
 
   String? get email => _email;
   String? get displayname => _displayname;
   String? get urlPhoto => _urlPhoto;
+  String? get phoneNumber => _phoneNumber;
 
   Future<void> setEmail({required String? value}) async {
     _email = value;
+    notifyListeners();
+  }
+
+  Future<void> setPhoneNumber({required String? value}) async {
+    _phoneNumber = value;
     notifyListeners();
   }
 
@@ -27,11 +34,13 @@ class UserProvider with ChangeNotifier {
   Future<void> setUser({
     required String? email,
     required String? displyname,
+    required String? phoneNumber,
     required String? urlphoto,
   }) async {
     _email = email;
     _displayname = displyname;
     _urlPhoto = urlphoto;
+    _phoneNumber = phoneNumber;
     notifyListeners();
   }
 }

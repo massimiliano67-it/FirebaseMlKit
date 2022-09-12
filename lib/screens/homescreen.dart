@@ -1,15 +1,23 @@
+import 'package:firebasemlkit/screens/visionposition.dart';
 import 'package:flutter/material.dart';
-
+import 'package:get/get.dart';
+import 'package:provider/provider.dart';
+import '../classes/visionpositionprovider.dart';
 import '../widgets/menubutton.dart';
+import '../widgets/navdrawer.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    VisioPositionProvider visionProvider =
+        context.watch<VisioPositionProvider>();
+
     return Scaffold(
+      drawer: const NavDrawer(),
       appBar: AppBar(
-        automaticallyImplyLeading: false,
+        //automaticallyImplyLeading: false,
         backgroundColor: Colors.blue,
         title: const Text(
           "Firebase & MLKIT",
@@ -23,10 +31,14 @@ class HomeScreen extends StatelessWidget {
                   crossAxisCount: 2, crossAxisSpacing: 16, mainAxisSpacing: 16),
               children: [
                 MenuButton(
-                  iconButton: Icons.abc,
-                  textButton: "Push me",
+                  iconButton: Icons.all_inclusive_sharp,
+                  textButton: "Vision Positioning",
                   callback: () {
-                    print("Button1");
+                    context.read<VisioPositionProvider>().setImage(value: null);
+                    context
+                        .read<VisioPositionProvider>()
+                        .clearTextCustomPanelControl();
+                    Get.to(const VisonPositionScreen());
                   },
                 ),
                 MenuButton(

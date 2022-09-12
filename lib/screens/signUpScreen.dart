@@ -23,6 +23,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController _confirmPass = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _customerNumber = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -123,7 +124,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   const SizedBox(
                     height: 12.0,
                   ),
-                  const InputTextWidget(
+                  InputTextWidget(
+                      controller: _customerNumber,
                       labelText: "Telephone number",
                       icon: Icons.phone,
                       obscureText: false,
@@ -229,14 +231,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         if (_formKey.currentState!.validate()) {
                           User? user =
                               await FireAuth.registerUsingEmailPassword(
-                                  email: _emailController.text,
-                                  password: _pass.text,
-                                  name: _nameController.text);
+                            email: _emailController.text,
+                            password: _pass.text,
+                            name: _nameController.text,
+                            phoneNumber: _customerNumber.text,
+                          );
                           if (user != null) {
                             this.context.read<UserProvider>().setUser(
-                                email: user.email,
-                                displyname: user.displayName,
-                                urlphoto: user.photoURL);
+                                email: _emailController.text,
+                                displyname: _nameController.text,
+                                urlphoto: user.photoURL,
+                                phoneNumber: _customerNumber.text);
                             Get.to(const HomeScreen());
                           } else {
                             showDialog(
