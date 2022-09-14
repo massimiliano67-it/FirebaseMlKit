@@ -2,7 +2,7 @@ import 'package:firebasemlkit/screens/visionposition.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
-import '../classes/visionpositionprovider.dart';
+import '../classes/visionposition/visionpositionprovider.dart';
 import '../widgets/menubutton.dart';
 import '../widgets/navdrawer.dart';
 

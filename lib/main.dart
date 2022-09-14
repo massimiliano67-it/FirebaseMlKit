@@ -1,14 +1,15 @@
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebasemlkit/classes/appstateprovider.dart';
-import 'package:firebasemlkit/classes/visionpositionprovider.dart';
+import 'package:firebasemlkit/classes/appstate/appstateprovider.dart';
+import 'package:firebasemlkit/classes/visionposition/visionpositionprovider.dart';
 import 'package:firebasemlkit/firebase_options.dart';
 import 'package:firebasemlkit/screens/loginScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 
-import 'classes/geopositionprovider.dart';
-import 'classes/userprovider.dart';
+import 'classes/visionposition/geopositionprovider.dart';
+import 'classes/user/userprovider.dart';
+import 'classes/visionposition/visionresult.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -20,7 +21,6 @@ Future<void> main() async {
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-
 
   // This widget is the root of your application.
   @override
@@ -34,6 +34,8 @@ class MyApp extends StatelessWidget {
               create: (_) => AppStateProvider()),
           ChangeNotifierProvider<GeoPositionProvider>(
               create: (_) => GeoPositionProvider()),
+          ChangeNotifierProvider<VisionResultProvider>(
+              create: (_) => VisionResultProvider()),
         ],
         builder: (context, _) {
           return GetMaterialApp(

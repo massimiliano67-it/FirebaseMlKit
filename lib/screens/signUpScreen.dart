@@ -6,8 +6,9 @@ import 'package:get/get.dart';
 import 'package:firebasemlkit/widgets/inputTextWidget.dart';
 import 'package:provider/provider.dart';
 
-import '../classes/userprovider.dart';
+import '../classes/user/userprovider.dart';
 import '../utils/authfirebase.dart';
+import '../utils/firestorebase.dart';
 import 'loginScreen.dart';
 
 class SignUpScreen extends StatefulWidget {
@@ -24,6 +25,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _customerNumber = TextEditingController();
+
+  FirestoreBase dbStore = FirestoreBase();
 
   @override
   Widget build(BuildContext context) {
@@ -238,10 +241,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           );
                           if (user != null) {
                             this.context.read<UserProvider>().setUser(
+                                id: user.uid,
                                 email: _emailController.text,
                                 displyname: _nameController.text,
                                 urlphoto: user.photoURL,
                                 phoneNumber: _customerNumber.text);
+                            // UserProvider _userPorvider = this.context.read<UserProvider>().toMap();
+                            dbStore.addUser(userProvider);
+
                             Get.to(const HomeScreen());
                           } else {
                             showDialog(

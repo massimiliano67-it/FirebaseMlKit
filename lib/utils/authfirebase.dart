@@ -41,7 +41,7 @@ class FireAuth {
       return user;
     }
     // ignore: avoid_single_cascade_in_expression_statements
-    try {
+    /*  try {
       await firestore.collection('users').doc(uid).set({
         'id': uid,
         'name': name,
@@ -50,7 +50,7 @@ class FireAuth {
       });
     } on Exception catch (e) {
       print("ERROR: " + e.toString());
-    }
+    } */
 
     return user;
   }

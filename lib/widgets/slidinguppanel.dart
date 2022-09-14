@@ -4,7 +4,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
-import '../classes/visionpositionprovider.dart';
+import '../classes/visionposition/visionpositionprovider.dart';
 
 class SlidingPanel extends StatefulWidget {
   XFile? image;

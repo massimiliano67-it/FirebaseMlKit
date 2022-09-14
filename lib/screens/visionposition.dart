@@ -1,7 +1,10 @@
 import 'dart:io';
-import 'package:firebasemlkit/classes/appstateprovider.dart';
-import 'package:firebasemlkit/classes/geopositionprovider.dart';
-import 'package:firebasemlkit/classes/visionpositionprovider.dart';
+import 'package:firebasemlkit/classes/appstate/appstateprovider.dart';
+import 'package:firebasemlkit/classes/visionposition/geopositionprovider.dart';
+import 'package:firebasemlkit/classes/visionposition/visionpositionprovider.dart';
+import '../classes/user/userprovider.dart';
+import '../utils/firebasestorage.dart';
+import '../utils/firestorebase.dart';
 import 'package:firebasemlkit/widgets/navdrawer.dart';
 import 'package:firebasemlkit/widgets/slidinguppanel.dart';
 import 'package:flutter/material.dart';
@@ -11,6 +14,8 @@ import 'package:image_picker/image_picker.dart';
 // ignore: depend_on_referenced_packages
 import 'package:provider/provider.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
+
+import '../classes/visionposition/visionresult.dart';
 
 class VisonPositionScreen extends StatefulWidget {
   const VisonPositionScreen({Key? key}) : super(key: key);
@@ -24,6 +29,7 @@ class _VisonPositionScreenState extends State<VisonPositionScreen> {
   final TextRecognizer _textRecognizer = TextRecognizer();
   final PanelController panelController = PanelController();
   late ImageLabeler imageLabeler;
+  FirestoreBase dbStore = FirestoreBase();
 
 // For geoposition
 
@@ -95,6 +101,36 @@ class _VisonPositionScreenState extends State<VisonPositionScreen> {
         .context
         .read<VisioPositionProvider>()
         .setTextCustomPanelControl(value: valuePanelControl);
+
+    // ignore: use_build_context_synchronously
+    this
+        .context
+        .read<VisionResultProvider>()
+        .setGeopositionCoordinate(lat: localLat, long: localLong);
+
+    // ignore: use_build_context_synchronously
+    this
+        .context
+        .read<VisionResultProvider>()
+        .setGeopositionCoordinate(lat: localLat, long: localLong);
+
+    final id = this.context.read<UserProvider>().id;
+
+    this.context.read<VisionResultProvider>().setUidUser(value: id);
+
+    FirestoreStorage _storage = FirestoreStorage();
+
+    // ignore: use_build_context_synchronously
+    XFile? localFile = context.read<VisioPositionProvider>().image;
+    //final _localPath = File(localFile!.path);
+
+    // ignore: use_build_context_synchronously
+    String url = await _storage.addFile(localFile!, "");
+
+    context.read<VisionResultProvider>().setUrlImage(value: url);
+
+    // ignore: use_build_context_synchronously
+    await dbStore.addResult(context.read<VisionResultProvider>());
   }
 
   @override
@@ -104,6 +140,10 @@ class _VisonPositionScreenState extends State<VisonPositionScreen> {
     AppStateProvider appStateProvider = context.watch<AppStateProvider>();
     GeoPositionProvider geopositionProvider =
         context.watch<GeoPositionProvider>();
+    VisionResultProvider visionresultprovider =
+        context.watch<VisionResultProvider>();
+
+    UserProvider visionruserprovider = context.watch<UserProvider>();
 
     // ignore: non_constant_identifier_names
     Future<void> ClearPaneControl() async {
@@ -190,6 +230,8 @@ class _VisonPositionScreenState extends State<VisonPositionScreen> {
   Future<void> processImage(InputImage inputImage, BuildContext context) async {
     String lableresult = "";
     String text = "";
+    List<String> listText = [];
+    List<String> listLabel = [];
 
     if (context.read<AppStateProvider>().isBusy) return;
     if (!context.read<AppStateProvider>().canProcess) return;
@@ -198,6 +240,9 @@ class _VisonPositionScreenState extends State<VisonPositionScreen> {
     context.read<VisioPositionProvider>().setLableresult(value: "");
     _initializeLabeler(context);
     final labels = await imageLabeler.processImage(inputImage);
+
+    // ignore: use_build_context_synchronously
+    //context.read<VisionResultProvider>().setImageLabel(value: labels);
 
     // ignore: use_build_context_synchronously
     context
@@ -209,19 +254,34 @@ class _VisonPositionScreenState extends State<VisonPositionScreen> {
     for (final label in labels) {
       lableresult =
           '${lableresult}Label: ${label.label}, Confidence: ${label.confidence.toStringAsFixed(2)}\n';
+
+      listLabel.add("${label.label} - ${label.confidence}");
     }
     // ignore: use_build_context_synchronously
     context
         .read<VisioPositionProvider>()
         .setTextCustomPanelControl(value: lableresult);
 
+    context.read<VisionResultProvider>().setImageLabel(value: listLabel);
+
     final recognizedText = await _textRecognizer.processImage(inputImage);
-    //_text = 'Recognized text:\n\n${recognizedText.text}\n\n';
+    // ignore: use_build_context_synchronously
+
+    //final List<String> _listText,
+
+    /*context
+        .read<VisionResultProvider>()
+        .setRecognizedText(value: recognizedText); */
 
     text = '\nRecognized text:\n';
     for (var i = 0; i < recognizedText.blocks.length; i++) {
-      text = '${text}block $i: ${recognizedText.blocks[i].text}\n';
+      if (recognizedText.blocks.length != null) {
+        text = '${text}block $i: ${recognizedText.blocks[i].text}\n';
+        listText.add(recognizedText.blocks[i].text);
+      }
     }
+
+    context.read<VisionResultProvider>().setRecognizedText(value: listText);
 
     // ignore: use_build_context_synchronously
     if (context.read<VisioPositionProvider>().textCustomPanelControl != null) {
@@ -240,6 +300,8 @@ class _VisonPositionScreenState extends State<VisonPositionScreen> {
     if (haspermission) {
       // ignore: use_build_context_synchronously
       getLocation(context);
+      // ignore: use_build_context_synchronously
     }
+    // ignore: use_build_context_synchronously
   }
 }

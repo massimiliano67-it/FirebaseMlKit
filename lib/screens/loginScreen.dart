@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebasemlkit/classes/userprovider.dart';
+import 'package:firebasemlkit/classes/user/userprovider.dart';
 import 'package:firebasemlkit/screens/homescreen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -8,7 +8,8 @@ import 'package:firebasemlkit/screens/signUpScreen.dart';
 import 'package:firebasemlkit/widgets/inputTextWidget.dart';
 import 'package:provider/provider.dart';
 
-import '../classes/geopositionprovider.dart';
+// ignore: unused_import
+import '../classes/visionposition/geopositionprovider.dart';
 import '../utils/authfirebase.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -25,7 +26,13 @@ class _SearchScreenState extends State<LoginScreen> {
     User? user = FirebaseAuth.instance.currentUser;
 
     if (user != null) {
-      Get.to(const HomeScreen());
+   /*   context.read<UserProvider>().setUser(
+          id: user.uid,
+          email: user.email,
+          displyname: user.displayName,
+          phoneNumber: null,
+          urlphoto: user.photoURL); */
+      Get.to(HomeScreen()) ;
     }
     return firebaseApp;
   }
@@ -119,6 +126,7 @@ class _SearchScreenState extends State<LoginScreen> {
                       );
                       if (user != null) {
                         this.context.read<UserProvider>().setUser(
+                            id: user.uid,
                             email: _emailController.text,
                             displyname: user.displayName,
                             urlphoto: user.photoURL,
